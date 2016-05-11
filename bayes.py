@@ -16,9 +16,9 @@ class Bayes_Classifier:
       try:
           self.pos_dic = self.load("pos_dic")
           self.neg_dic = self.load("neg_dic")
+          print "loading cached data: Done"
       except IOError:
           print "no existing trained data"
-          #TODO
           self.train()
 
 
@@ -33,6 +33,21 @@ class Bayes_Classifier:
       #print len(IFileList)
       for filename in IFileList:
           fileType = self.parseType(filename)
+          filePath = "data/" + filename
+          fileContent = self.loadFile(filePath)
+          tokens = self.tokenize(fileContent)
+          if fileType == "pos":
+              for token in tokens:
+                  pos_dic[token] = pos_dic.get(token, 0) + 1
+          else:
+              for token in tokens:
+                  neg_dic[token] = neg_dic.get(token, 0) + 1
+      self.pos_dic = pos_dic
+      self.neg_dic = neg_dic
+      self.save(pos_dic, "pos_dic")
+      self.save(neg_dic, "neg_dic")
+      print "finish training"
+
 
    def classify(self, sText):
       """Given a target string sText, this function returns the most likely document
@@ -66,6 +81,7 @@ class Bayes_Classifier:
    def parseType(self, name):
       stars = name.split("-")[1]
       return "pos" if stars == "5" else "neg"
+
    def tokenize(self, sText):
       """Given a string of text sText, returns a list of the individual tokens that
       occur in that string (in order)."""
