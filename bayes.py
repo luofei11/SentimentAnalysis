@@ -19,11 +19,20 @@ class Bayes_Classifier:
       except IOError:
           print "no existing trained data"
           #TODO
-          #self.train()
+          self.train()
 
 
    def train(self):
       """Trains the Naive Bayes Sentiment Classifier."""
+      IFileList = []
+      pos_dic, neg_dic = dict(), dict()
+      for fFileObj in os.walk("data/"):
+          #print fFileObj
+          IFileList = fFileObj[2]
+          break
+      #print len(IFileList)
+      for filename in IFileList:
+          fileType = self.parseType(filename)
 
    def classify(self, sText):
       """Given a target string sText, this function returns the most likely document
@@ -54,7 +63,9 @@ class Bayes_Classifier:
       dObj = u.load()
       f.close()
       return dObj
-
+   def parseType(self, name):
+      stars = name.split("-")[1]
+      return "pos" if stars == "5" else "neg"
    def tokenize(self, sText):
       """Given a string of text sText, returns a list of the individual tokens that
       occur in that string (in order)."""
