@@ -118,3 +118,12 @@ class Bayes_Classifier:
          lTokens.append(sToken)
 
       return lTokens
+
+    def calPrecision(self, testing_data):
+        #TODO
+
+    def calRecall(self, testing_data):
+        #TODO
+
+    def fMeasure(self, testing_data):
+        #TODO
