@@ -8,29 +8,35 @@ import math, os, pickle, re
 
 class Bayes_Classifier:
 
-   def __init__(self):
+   def __init__(self, eval = False):
       """This method initializes and trains the Naive Bayes Sentiment Classifier.  If a
       cache of a trained classifier has been stored, it loads this cache.  Otherwise,
       the system will proceed through training.  After running this method, the classifier
       is ready to classify input text."""
-      try:
-          self.pos_dic = self.load("pos_dic")
-          self.neg_dic = self.load("neg_dic")
-          print "loading cached data: Done"
-      except IOError:
-          print "no existing trained data"
-          self.train()
+      if eval:
+          #for evaluation purpose
+          self.pos_dic = dict()
+          self.neg_dic = dict()
+      else:
+          try:
+              self.pos_dic = self.load("pos_dic")
+              self.neg_dic = self.load("neg_dic")
+              print "loading cached data: Done"
+          except IOError:
+              print "no existing trained data"
+              self.train()
 
 
-   def train(self):
+   def train(self, training_data = None):
       """Trains the Naive Bayes Sentiment Classifier."""
       IFileList = []
       pos_dic, neg_dic = dict(), dict()
-      for fFileObj in os.walk("data/"):
-          #print fFileObj
-          IFileList = fFileObj[2]
-          break
-      #print len(IFileList)
+      if not training_data:
+          for fFileObj in os.walk("data/"):
+              IFileList = fFileObj[2]
+              break
+      else:
+          IFileList = training_data
       for filename in IFileList:
           fileType = self.parseType(filename)
           filePath = "data/" + filename
@@ -44,8 +50,9 @@ class Bayes_Classifier:
                   neg_dic[token] = neg_dic.get(token, 0) + 1
       self.pos_dic = pos_dic
       self.neg_dic = neg_dic
-      self.save(pos_dic, "pos_dic")
-      self.save(neg_dic, "neg_dic")
+      if not training_data:
+          self.save(pos_dic, "pos_dic")
+          self.save(neg_dic, "neg_dic")
       print "finish training"
 
 
