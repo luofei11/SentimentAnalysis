@@ -56,15 +56,8 @@ class Bayes_Classifier:
       tokens = self.tokenize(sText)
       posProbability, negProbability = 0, 0
       for token in tokens:
-          #a = self.pos_dic.get(token, 0) + 1
-          #b = sum(self.pos_dic.values()) + 1
-          #print a
-          #print b
-          #print float(a) / float(b)
-          #print float((self.pos_dic.get(token,0) + 1) / (sum(self.pos_dic.values()) + 1))
-          #print float((self.neg_dic.get(token,0) + 1) / (sum(self.neg_dic.values()) + 1))
-          posProbability += math.log(float((self.pos_dic.get(token,0) + 1)) / float((sum(self.pos_dic.values()) + 1)))
-          negProbability += math.log(float((self.neg_dic.get(token,0) + 1)) / float((sum(self.neg_dic.values()) + 1)))
+          posProbability += math.log(float((self.pos_dic.get(token,0) + 1)) / float((sum(self.pos_dic.values()))))
+          negProbability += math.log(float((self.neg_dic.get(token,0) + 1)) / float((sum(self.neg_dic.values()))))
       if posProbability > negProbability:
           return "positive"
       else:
