@@ -21,4 +21,14 @@ def cross_validation(data):
     recall = calRecall(bc, testing_data)
     f_measure = fMeasure(bc, testing_data)
     return prec, recall, f_measure
+
+def calPrecision(bc, testing_data):
+    #TODO
+    
+
+def calRecall(bc, testing_data):
+    #TODO
+
+def fMeasure(bc, testing_data):
+    #TODO
 main()
