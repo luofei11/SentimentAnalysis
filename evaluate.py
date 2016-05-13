@@ -17,8 +17,8 @@ def cross_validation(data):
     training_data = data[num / 10 + 1:]
     bc = Bayes_Classifier(eval = True)
     bc.train(training_data)
-    prec = bc.calPrecision(testing_data)
-    recall = bc.calRecall(testing_data)
-    f_measure = bc.fMeasure(testing_data)
+    prec = calPrecision(bc, testing_data)
+    recall = calRecall(bc, testing_data)
+    f_measure = fMeasure(bc, testing_data)
     return prec, recall, f_measure
 main()
