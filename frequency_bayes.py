@@ -42,7 +42,7 @@ class Bayes_Classifier:
           filePath = "data/" + filename
           fileContent = self.loadFile(filePath)
           tokens = self.tokenize(fileContent)
-          if fileType == "pos":
+          if fileType == "positive":
               for token in tokens:
                   pos_dic[token] = pos_dic.get(token, 0) + 1
           else:
@@ -96,7 +96,7 @@ class Bayes_Classifier:
       return dObj
    def parseType(self, name):
       stars = name.split("-")[1]
-      return "pos" if stars == "5" else "neg"
+      return "positive" if stars == "5" else "negative"
 
    def tokenize(self, sText):
       """Given a string of text sText, returns a list of the individual tokens that

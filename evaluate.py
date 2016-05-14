@@ -39,17 +39,17 @@ def do_evaluation(bc, testing_data):
         tResult = bc.classify(fileContent)
         if tResult == "positive":
             classifiedPos += 1
-            if fileType == "pos":
+            if fileType == "positive":
                 actualPos += 1
         elif tResult == "negative":
             classifiedNeg += 1
-            if fileType == "neg":
+            if fileType == "negative":
                 actualNeg += 1
-        if fileType == "pos":
+        if fileType == "positive":
             numPos += 1
             if tResult == "positive":
                 numResultPos += 1
-        elif fileType == "neg":
+        elif fileType == "negative":
             numNeg += 1
             if tResult == "negative":
                 numResultNeg += 1
