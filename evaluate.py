@@ -22,7 +22,7 @@ def main():
 def cross_validation(data):
     num = len(data)
     testing_data = data[:num / 10]
-    training_data = data[num / 10 + 1:]
+    training_data = data[num / 10:]
     bc = Bayes_Classifier(eval = True)
     bc.train(training_data)
     prec, recall, f_measure = do_evaluation(bc, testing_data)
@@ -63,5 +63,5 @@ def cal_recall(typeList, resultList):
     numNeg = len(typeList) - numPos
     posRecall = float(sum(resPosMapper)) / numPos
     negRecall = float(sum(resNegMapper)) / numNeg
-    return (posRecall + negRecall) * 0.5 
+    return (posRecall + negRecall) * 0.5
 main()
