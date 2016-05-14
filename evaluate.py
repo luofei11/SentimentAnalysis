@@ -30,31 +30,38 @@ def cross_validation(data):
 
 def do_evaluation(bc, testing_data):
     #TODO
-    actualPos, actualNeg, classifiedPos, classifiedNeg = 0, 0, 0, 0
-    numPos, numNeg, numResultPos, numResultNeg = 0, 0, 0, 0
+    typeList, resultList = [], []
     for testing_filename in testing_data:
         filePath = "data/" + testing_filename
         fileContent = bc.loadFile(filePath)
         fileType = bc.parseType(testing_filename)
         tResult = bc.classify(fileContent)
-        if tResult == "positive":
-            classifiedPos += 1
-            if fileType == "positive":
-                actualPos += 1
-        elif tResult == "negative":
-            classifiedNeg += 1
-            if fileType == "negative":
-                actualNeg += 1
-        if fileType == "positive":
-            numPos += 1
-            if tResult == "positive":
-                numResultPos += 1
-        elif fileType == "negative":
-            numNeg += 1
-            if tResult == "negative":
-                numResultNeg += 1
-    precision = (float(actualPos) / float(classifiedPos) + float(actualNeg) / float(classifiedNeg)) * 0.5
-    recall = (float(numResultPos) / numPos + float(numResultNeg) / numNeg) * 0.5
+        typeList.append(fileType)
+        resultList.append(tResult)
+    precision = cal_precision(typeList, resultList)
+    recall = cal_recall(typeList, resultList)
     f_measure = 2 * precision * recall / (precision + recall)
     return precision, recall, f_measure
+
+def cal_precision(typeList, resultList):
+    #TODO
+    resMapper = map(lambda x: 1 if x == "positive" else 0, resultList)
+    typePosMapper = map(lambda x, y: 1 if x == "positive" and y == "positive" else 0, typeList, resultList)
+    typeNegMapper = map(lambda x, y: 1 if x == "negative" and y == "negative" else 0, typeList, resultList)
+    numPos = sum(resMapper)
+    numNeg = len(resultList) - numPos
+    posPrecision = float(sum(typePosMapper)) / numPos
+    negPrecision = float(sum(typeNegMapper)) / numNeg
+    return (posPrecision + negPrecision) * 0.5
+
+def cal_recall(typeList, resultList):
+    #TODO
+    typeMapper = map(lambda x: 1 if x == "positive" else 0, typeList)
+    resPosMapper = map(lambda x, y: 1 if x == "positive" and y == "positive" else 0, resultList, typeList)
+    resNegMapper = map(lambda x, y: 1 if x == "negative" and y == "negative" else 0, resultList, typeList)
+    numPos = sum(typeMapper)
+    numNeg = len(typeList) - numPos
+    posRecall = float(sum(resPosMapper)) / numPos
+    negRecall = float(sum(resNegMapper)) / numNeg
+    return (posRecall + negRecall) * 0.5 
 main()
