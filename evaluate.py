@@ -9,7 +9,7 @@ def main():
         #print fFileObj
         data = fFileObj[2]
         break
-    for iter in range(10):
+    for iter in range(1):
         shuffle(data)
         prec, recall, f_measure = cross_validation(data)
         pSum += prec
