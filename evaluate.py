@@ -21,12 +21,18 @@ def main():
     print "f measure is: ", finalF
 def cross_validation(data):
     num = len(data)
-    testing_data = data[:num / 10]
-    training_data = data[num / 10:]
-    bc = Bayes_Classifier(eval = True)
-    bc.train(training_data)
-    prec, recall, f_measure = do_evaluation(bc, testing_data)
-    return prec, recall, f_measure
+    chunk = num / 10
+    pSum, rSum, fSum = 0, 0, 0
+    for i in range(10):
+        testing_data = data[(chunk * i) : (chunk * (i + 1))]
+        training_data = data[ :(chunk * i)] + data[(chunk * (i + 1)): ]
+        bc = Bayes_Classifier(eval = True)
+        bc.train(training_data)
+        prec, recall, f_measure = do_evaluation(bc, testing_data)
+        pSum += prec
+        rSum += recall
+        fSum += f_measure
+    return pSum / 10, rSum / 10, fSum / 10
 
 def do_evaluation(bc, testing_data):
     #TODO
