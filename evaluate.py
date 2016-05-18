@@ -15,10 +15,10 @@ def main():
         pSum += prec
         rSum += recall
         fSum += f_measure
-    finalP, finalR, finalF = pSum / 10, rSum / 10, fSum / 10
-    print "precision is: ", finalP
-    print "recall is: ", finalR
-    print "f measure is: ", finalF
+    #finalP, finalR, finalF = pSum / 10, rSum / 10, fSum / 10
+    print "precision is: ", pSum
+    print "recall is: ", rSum
+    print "f measure is: ", fSum
 def cross_validation(data):
     num = len(data)
     chunk = num / 10
@@ -42,6 +42,7 @@ def do_evaluation(bc, testing_data):
         fileContent = bc.loadFile(filePath)
         fileType = bc.parseType(testing_filename)
         tResult = bc.classify(fileContent)
+        #print "result: ", tResult
         typeList.append(fileType)
         resultList.append(tResult)
     precision = cal_precision(typeList, resultList)
@@ -55,6 +56,7 @@ def cal_precision(typeList, resultList):
     typePosMapper = map(lambda x, y: 1 if x == "positive" and y == "positive" else 0, typeList, resultList)
     typeNegMapper = map(lambda x, y: 1 if x == "negative" and y == "negative" else 0, typeList, resultList)
     numPos = sum(resMapper)
+    #print "numPos:", numPos
     numNeg = len(resultList) - numPos
     posPrecision = float(sum(typePosMapper)) / numPos
     negPrecision = float(sum(typeNegMapper)) / numNeg
