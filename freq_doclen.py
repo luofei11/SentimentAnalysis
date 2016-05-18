@@ -19,15 +19,15 @@ class Bayes_Classifier:
           self.neg_dic = dict()
       else:
           try:
-              self.pos_dic = self.load("freq_bigram_pos_dic")
-              self.neg_dic = self.load("freq_bigram_neg_dic")
+              self.pos_dic = self.load("freq_doclen_pos_dic")
+              self.neg_dic = self.load("freq_doclen_neg_dic")
               print "loading cached data: Done"
           except IOError:
               print "no existing trained data"
               self.train()
 
 
-   def train(self, training_data):
+   def train(self, training_data = None):
       """Trains the Naive Bayes Sentiment Classifier."""
       IFileList = []
       pos_dic, neg_dic = dict(), dict()
@@ -41,32 +41,22 @@ class Bayes_Classifier:
           fileType = self.parseType(filename)
           filePath = "data/" + filename
           fileContent = self.loadFile(filePath)
+          docLen = len(fileContent)
           tokens = self.tokenize(fileContent)
-          if tokens:
-              if fileType == "positive":
-                  for i in range(len(tokens) - 1):
-                      unigram = tokens[i]
-                      bigram = tokens[i] + " " + tokens[i + 1]
-                      pos_dic[bigram] = pos_dic.get(bigram, 0) + 1
-                      pos_dic[unigram] = pos_dic.get(unigram, 0) + 1
-                  pos_dic[tokens[-1]] = pos_dic.get(tokens[-1], 0) + 1
-                  #for token in tokens:
-                      #pos_dic[token] = pos_dic.get(token, 0) + 1
-              else:
-                  for i in range(len(tokens) - 1):
-                      unigram = tokens[i]
-                      bigram = tokens[i] + " " + tokens[i + 1]
-                      neg_dic[bigram] = neg_dic.get(bigram, 0) + 1
-                      neg_dic[unigram] = neg_dic.get(unigram, 0) + 1
-                  neg_dic[tokens[-1]] = neg_dic.get(tokens[-1], 0) + 1
-                  #for token in tokens:
-                      #neg_dic[token] = neg_dic.get(token, 0) + 1
+          if fileType == "positive":
+              pos_dic[docLen] = pos_dic.get(docLen, 0) + 1
+              for token in tokens:
+                  pos_dic[token] = pos_dic.get(token, 0) + 1
+          else:
+              neg_dic[docLen] = neg_dic.get(docLen, 0) + 1
+              for token in tokens:
+                  neg_dic[token] = neg_dic.get(token, 0) + 1
       self.pos_dic = pos_dic
       self.neg_dic = neg_dic
       if not training_data:
-          self.save(pos_dic, "freq_bigram_pos_dic")
-          self.save(neg_dic, "freq_bigram_neg_dic")
-      print "finish training classifier with bigram frequency"
+          self.save(pos_dic, "freq_doclen_pos_dic")
+          self.save(neg_dic, "freq_doclen_neg_dic")
+      print "finish training frequency doclength"
 
 
    def classify(self, sText):
@@ -77,16 +67,12 @@ class Bayes_Classifier:
       posProbability, negProbability = 0, 0
       posNum, negNum = float(sum(self.pos_dic.values())), float(sum(self.neg_dic.values()))
 
-      for i in range(len(tokens) - 1):
-          unigram = tokens[i]
-          bigram = tokens[i] + " " + tokens[i + 1]
-          posProbability += math.log(float((self.pos_dic.get(bigram, 0) + 1)) / posNum)
-          posProbability += math.log(float((self.pos_dic.get(unigram, 0) + 1)) / posNum)
-          negProbability += math.log(float((self.neg_dic.get(bigram, 0) + 1)) / negNum)
-          negProbability += math.log(float((self.neg_dic.get(unigram, 0) + 1)) / negNum)
-      if tokens:
-          posProbability += math.log(float((self.pos_dic.get(tokens[-1], 0) + 1)) / posNum)
-          negProbability += math.log(float((self.neg_dic.get(tokens[-1], 0) + 1)) / negNum)
+      tLen = len(sText)
+      for token in tokens:
+          posProbability += math.log(float((self.pos_dic.get(token,0) + 1)) / posNum)
+          negProbability += math.log(float((self.neg_dic.get(token,0) + 1)) / negNum)
+      posProbability += math.log(float((self.pos_dic.get(tLen,0) + 1)) / posNum)
+      negProbability += math.log(float((self.neg_dic.get(tLen,0) + 1)) / negNum)
       if posProbability > negProbability:
           return "positive"
       else:
