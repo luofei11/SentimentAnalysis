@@ -1,38 +1,47 @@
-from frequency_bayes import Bayes_Classifier
+from freq_doclen import Bayes_Classifier
 from random import shuffle
 import os
 def main():
     """DO 10 times of 10 fold cross validation"""
     data = []
-    pSum, rSum, fSum = 0, 0, 0
+    ppSum, npSum, prSum, nrSum, pfSum, nfSum = 0, 0, 0, 0, 0, 0
     for fFileObj in os.walk("data/"):
         #print fFileObj
         data = fFileObj[2]
         break
     for iter in range(1):
         shuffle(data)
-        prec, recall, f_measure = cross_validation(data)
-        pSum += prec
-        rSum += recall
-        fSum += f_measure
+        pos_prec, neg_prec, pos_recall, neg_recall, pos_f_measure, neg_f_measure = cross_validation(data)
+        ppSum += pos_prec
+        npSum += neg_prec
+        prSum += pos_recall
+        nrSum += neg_recall
+        pfSum += pos_f_measure
+        nfSum += neg_f_measure
     #finalP, finalR, finalF = pSum / 10, rSum / 10, fSum / 10
-    print "precision is: ", pSum
-    print "recall is: ", rSum
-    print "f measure is: ", fSum
+    print "positive precision is: ", ppSum
+    print "negative precision is: ", npSum
+    print "positive recall is: ", prSum
+    print "negative recall is: ", nrSum
+    print "positive f measure is: ", pfSum
+    print "negative f measure is: ", nfSum
 def cross_validation(data):
     num = len(data)
     chunk = num / 10
-    pSum, rSum, fSum = 0, 0, 0
+    ppSum, npSum, prSum, nrSum, pfSum, nfSum = 0, 0, 0, 0, 0, 0
     for i in range(10):
         testing_data = data[(chunk * i) : (chunk * (i + 1))]
         training_data = data[ :(chunk * i)] + data[(chunk * (i + 1)): ]
         bc = Bayes_Classifier(eval = True)
         bc.train(training_data)
-        prec, recall, f_measure = do_evaluation(bc, testing_data)
-        pSum += prec
-        rSum += recall
-        fSum += f_measure
-    return pSum / 10, rSum / 10, fSum / 10
+        pos_prec, neg_prec, pos_recall, neg_recall, pos_f_measure, neg_f_measure = do_evaluation(bc, testing_data)
+        ppSum += pos_prec
+        npSum += neg_prec
+        prSum += pos_recall
+        nrSum += neg_recall
+        pfSum += pos_f_measure
+        nfSum += neg_f_measure
+    return ppSum / 10, npSum / 10, prSum / 10, nrSum / 10, pfSum / 10, nfSum / 10
 
 def do_evaluation(bc, testing_data):
     #TODO
@@ -45,10 +54,11 @@ def do_evaluation(bc, testing_data):
         #print "result: ", tResult
         typeList.append(fileType)
         resultList.append(tResult)
-    precision = cal_precision(typeList, resultList)
-    recall = cal_recall(typeList, resultList)
-    f_measure = 2 * precision * recall / (precision + recall)
-    return precision, recall, f_measure
+    pos_precision, neg_precision = cal_precision(typeList, resultList)
+    pos_recall, neg_recall = cal_recall(typeList, resultList)
+    pos_f_measure = 2 * pos_precision * pos_recall / (pos_precision + pos_recall)
+    neg_f_measure = 2 * neg_precision * neg_recall / (neg_precision + neg_recall)
+    return pos_precision, neg_precision, pos_recall, neg_recall, pos_f_measure, neg_f_measure
 
 def cal_precision(typeList, resultList):
     #TODO
@@ -60,7 +70,8 @@ def cal_precision(typeList, resultList):
     numNeg = len(resultList) - numPos
     posPrecision = float(sum(typePosMapper)) / numPos
     negPrecision = float(sum(typeNegMapper)) / numNeg
-    return (posPrecision + negPrecision) * 0.5
+    return posPrecision, negPrecision
+    # return (posPrecision + negPrecision) * 0.5
 
 def cal_recall(typeList, resultList):
     #TODO
@@ -71,5 +82,6 @@ def cal_recall(typeList, resultList):
     numNeg = len(typeList) - numPos
     posRecall = float(sum(resPosMapper)) / numPos
     negRecall = float(sum(resNegMapper)) / numNeg
-    return (posRecall + negRecall) * 0.5
+    return posRecall, negRecall
+    # return (posRecall + negRecall) * 0.5
 main()
