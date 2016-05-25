@@ -1,37 +1,59 @@
-from freq_doclen import Bayes_Classifier
+# Name: evaluate.py
+# Date: 5/23/2016
+# Description:
+# Evaluates the performance(precision, recall and F1 measure) of a bayes classifier
+# Author(s) names AND netid's:
+#        -Fei Luo(fla414)
+#        -Ye  Xue(yxe836)
+# Group work statement: All group members were present and contributing during all work on this project.
+#
+from freq_bigram import Bayes_Classifier
 from random import shuffle
 import os
+
+def parseType(name):
+   stars = name.split("-")[1]
+   return "positive" if stars == "5" else "negative"
 def main():
-    """DO 10 times of 10 fold cross validation"""
+    """Performs 10 trials of 10 fold cross validation"""
     data = []
     ppSum, npSum, prSum, nrSum, pfSum, nfSum = 0, 0, 0, 0, 0, 0
-    for fFileObj in os.walk("data/"):
-        #print fFileObj
+    for fFileObj in os.walk("movies_reviews/"):
         data = fFileObj[2]
         break
-    for iter in range(1):
-        shuffle(data)
-        pos_prec, neg_prec, pos_recall, neg_recall, pos_f_measure, neg_f_measure = cross_validation(data)
+    pos_data, neg_data = [], []
+    for filename in data:
+        if parseType(filename) == "positive":
+            pos_data.append(filename)
+        else:
+            neg_data.append(filename)
+    for iter in range(10):
+        print iter, "th iteration"
+        shuffle(pos_data)
+        shuffle(neg_data)
+        pos_prec, neg_prec, pos_recall, neg_recall, pos_f_measure, neg_f_measure = cross_validation(pos_data, neg_data)
         ppSum += pos_prec
         npSum += neg_prec
         prSum += pos_recall
         nrSum += neg_recall
         pfSum += pos_f_measure
         nfSum += neg_f_measure
-    #finalP, finalR, finalF = pSum / 10, rSum / 10, fSum / 10
-    print "positive precision is: ", ppSum
-    print "negative precision is: ", npSum
-    print "positive recall is: ", prSum
-    print "negative recall is: ", nrSum
-    print "positive f measure is: ", pfSum
-    print "negative f measure is: ", nfSum
-def cross_validation(data):
-    num = len(data)
-    chunk = num / 10
+    print "positive precision is: ", ppSum / 10
+    print "negative precision is: ", npSum / 10
+    print "positive recall is: ", prSum / 10
+    print "negative recall is: ", nrSum / 10
+    print "positive f measure is: ", pfSum / 10
+    print "negative f measure is: ", nfSum / 10
+def cross_validation(pos_data, neg_data):
+    pos_num = len(pos_data)
+    neg_num = len(neg_data)
+    pos_chunk = pos_num / 10
+    neg_chunk = neg_num / 10
     ppSum, npSum, prSum, nrSum, pfSum, nfSum = 0, 0, 0, 0, 0, 0
     for i in range(10):
-        testing_data = data[(chunk * i) : (chunk * (i + 1))]
-        training_data = data[ :(chunk * i)] + data[(chunk * (i + 1)): ]
+        #evenly distributes the positive and negative documents in the testing data
+        testing_data = pos_data[(pos_chunk * i) : (pos_chunk * (i + 1))] + neg_data[(neg_chunk * i) : (neg_chunk * (i + 1))]
+        training_data = pos_data[ :(pos_chunk * i)] + pos_data[(pos_chunk * (i + 1)): ] + neg_data[ :(neg_chunk * i)] + neg_data[(neg_chunk * (i + 1)): ]
         bc = Bayes_Classifier(eval = True)
         bc.train(training_data)
         pos_prec, neg_prec, pos_recall, neg_recall, pos_f_measure, neg_f_measure = do_evaluation(bc, testing_data)
@@ -45,9 +67,10 @@ def cross_validation(data):
 
 def do_evaluation(bc, testing_data):
     #TODO
+    """Given a classifier and testing data, return the performance measurements"""
     typeList, resultList = [], []
     for testing_filename in testing_data:
-        filePath = "data/" + testing_filename
+        filePath = "movies_reviews/" + testing_filename
         fileContent = bc.loadFile(filePath)
         fileType = bc.parseType(testing_filename)
         tResult = bc.classify(fileContent)
@@ -62,6 +85,7 @@ def do_evaluation(bc, testing_data):
 
 def cal_precision(typeList, resultList):
     #TODO
+    """Given the file type list and classification result list, return the precision"""
     resMapper = map(lambda x: 1 if x == "positive" else 0, resultList)
     typePosMapper = map(lambda x, y: 1 if x == "positive" and y == "positive" else 0, typeList, resultList)
     typeNegMapper = map(lambda x, y: 1 if x == "negative" and y == "negative" else 0, typeList, resultList)
@@ -75,6 +99,7 @@ def cal_precision(typeList, resultList):
 
 def cal_recall(typeList, resultList):
     #TODO
+    """Given the file type list and classification result list, return the recall"""
     typeMapper = map(lambda x: 1 if x == "positive" else 0, typeList)
     resPosMapper = map(lambda x, y: 1 if x == "positive" and y == "positive" else 0, resultList, typeList)
     resNegMapper = map(lambda x, y: 1 if x == "negative" and y == "negative" else 0, resultList, typeList)
